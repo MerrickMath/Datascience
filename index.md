@@ -15,8 +15,8 @@
   <a class="card" href="https://apcentral.collegeboard.org/courses/ap-statistics/exam" style="text-decoration:none;border:1px solid #e6e6e6;border-radius:12px;padding:.9rem">
     <strong>Exam Info</strong><br><small>Format, topics, scoring</small>
   </a>
-  <a class="card" href="https://apcentral.collegeboard.org/courses/ap-statistics/exam/past-exam-questions" style="text-decoration:none;border:1px solid #e6e6e6;border-radius:12px;padding:.9rem">
-    <strong>Past Exam Problems</strong><br><small>Past Exam Poblems</small>
+  <a class="card" href="https://www.datacamp.com" style="text-decoration:none;border:1px solid #e6e6e6;border-radius:12px;padding:.9rem">
+    <strong>Data Camp</strong><br><small> Online MOOC </small>
   </a>
 </section>
 
