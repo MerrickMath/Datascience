@@ -9,8 +9,11 @@
 
 <!-- Quick links as “cards” -->
 <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.75rem;margin:1rem 0">
-  <a class="card" href="https://apcentral.collegeboard.org/media/pdf/ap-statistics-course-at-a-glance.pdf" style="text-decoration:none;border:1px solid #e6e6e6;border-radius:12px;padding:.9rem">
-    <strong>Course at a Glance</strong><br><small>College Board</small>
+  <a class="card" href="https://www.rstudio.com/products/rstudio/download/" style="text-decoration:none;border:1px solid #e6e6e6;border-radius:12px;padding:.9rem">
+    <strong> R Studio Download </strong><br><small> Open Source Software </small>
+  </a>
+  <a class="card" href="https://www.kaggle.com" style="text-decoration:none;border:1px solid #e6e6e6;border-radius:12px;padding:.9rem">
+    <strong>Kaggle</strong><br><small>Machine Learning Community</small>
   </a>
   <a class="card" href="https://www.datacamp.com" style="text-decoration:none;border:1px solid #e6e6e6;border-radius:12px;padding:.9rem">
     <strong> Data Camp </strong><br><small> Online MOOC </small>
@@ -27,6 +30,7 @@
     <a href="https://merrickmath.github.io/Datascience/assignments/Assignment1.pdf">Assignment 1</a> |
     <a href="https://merrickmath.github.io/Datascience/assignments/Assignment1Solutions.pdf">Assignment 1 Solutions</a>
   </li>
+  <!---
   <li><strong>Assignment 2:</strong>
     <a href="https://merrickmath.github.io/Datascience/assignments/Assignment2.pdf">Assignment 2</a> |
     <a href="https://merrickmath.github.io/Datascience/assignments/Assignment2Solutions.pdf">Assignment 2 Solutions</a>
@@ -63,6 +67,7 @@
     <a href="https://merrickmath.github.io/Datascience/assignments/Assignment10.pdf">Assignment 10</a> |
     <a href="https://merrickmath.github.io/Datascience/assignments/Assignment10Solutions.pdf">Assignment 10 Solutions</a>
   </li>
+  --->
 </ul>
 
 
@@ -73,6 +78,8 @@
 <ul>
   <li><a href="https://drive.google.com/drive/folders/1SAwh7_BTf8Mkrvddb032jgdsNS6mII9f?usp=sharing">Class Datasets</a></li>
   <li><a href="https://www.r-project.org">R download</a></li>
+  <li><a href="https://www.tug.org/mactex/">MacTex Download</a></li>
+  <li><a href="https://www.overleaf.com">Overleaf</a></li>
   <li><a href="https://www.rstudio.com/products/rstudio/download/">R Studio download</a></li>
 </ul>
 
