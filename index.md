@@ -21,75 +21,60 @@
 </section>
 
 
-<!-- Assessments -->
-<h2 id="tests">Tests</h2>
-<p><em>Approved Calculators are allowed on all tests.</em></p>
-<ul>
-  <li><strong>Unit 1:</strong> </li>
-  <li><strong>Unit 2:</strong> </li>
-  <li><strong>Unit 3:</strong> </li>
-  <li><strong>Unit 4:</strong> </li>
-  <li><strong>Unit 5:</strong> </li>
-  <li><strong>Unit 6:</strong> </li>
-  <li><strong>Unit 7:</strong> </li>
-  <li><strong>Unit 8:</strong> </li>
-  <li><strong>Unit 9:</strong> </li>
-</ul>
-
-
-<!-- Materials -->
-<h2 id="materials">In-Class Materials</h2>
-<p><em>Each unit includes the full slide deck and a concise “Quick Notes” handout for review.</em></p>
+<!-- Assignments -->
+<h2 id="assignments">Assignments</h2>
+<p><em>Problem sets and fully worked solutions.</em></p>
 
 <ul>
-  <li><strong>Unit 1:</strong> 
-    <a href="https://merrickmath.github.io/MerrickMath.github.io-APSTAT/materials/Unit1.pdf">Slides</a> | 
-    <a href="https://merrickmath.github.io/MerrickMath.github.io-APSTAT/materials/Unit1QuickNotes.pdf">Quick Notes</a>
+  <li><strong>Assignment 1:</strong>
+    <a href="https://merrickmath.github.io/Datascience/assignments/Assignment1.pdf">Assignment 1</a> |
+    <a href="https://merrickmath.github.io/Datascience/assignments/Assignment1Solutions.pdf">Assignment 1 Solutions</a>
   </li>
-  <li><strong>Unit 2:</strong> 
-    <a href="https://merrickmath.github.io/MerrickMath.github.io-APSTAT/materials/Unit2.pdf">Slides</a> | 
-    <a href="https://merrickmath.github.io/MerrickMath.github.io-APSTAT/materials/Unit2QuickNotes.pdf">Quick Notes</a>
+  <li><strong>Assignment 2:</strong>
+    <a href="https://merrickmath.github.io/Datascience/assignments/Assignment2.pdf">Assignment 2</a> |
+    <a href="https://merrickmath.github.io/Datascience/assignments/Assignment2Solutions.pdf">Assignment 2 Solutions</a>
   </li>
-  <li><strong>Unit 3:</strong> 
-    <a href="https://merrickmath.github.io/MerrickMath.github.io-APSTAT/materials/Unit3.pdf">Slides</a> | 
-    <a href="https://merrickmath.github.io/MerrickMath.github.io-APSTAT/materials/Unit3QuickNotes.pdf">Quick Notes</a>
+  <li><strong>Assignment 3:</strong>
+    <a href="https://merrickmath.github.io/Datascience/assignments/Assignment3.pdf">Assignment 3</a> |
+    <a href="https://merrickmath.github.io/Datascience/assignments/Assignment3Solutions.pdf">Assignment 3 Solutions</a>
   </li>
-  <li><strong>Unit 4:</strong> 
-    <a href="https://merrickmath.github.io/MerrickMath.github.io-APSTAT/materials/Unit4.pdf">Slides</a> | 
-    <a href="https://merrickmath.github.io/MerrickMath.github.io-APSTAT/materials/Unit4QuickNotes.pdf">Quick Notes</a>
+  <li><strong>Assignment 4:</strong>
+    <a href="https://merrickmath.github.io/Datascience/assignments/Assignment4.pdf">Assignment 4</a> |
+    <a href="https://merrickmath.github.io/Datascience/assignments/Assignment4Solutions.pdf">Assignment 4 Solutions</a>
   </li>
-  <li><strong>Unit 5:</strong> 
-    <a href="https://merrickmath.github.io/MerrickMath.github.io-APSTAT/materials/Unit5.pdf">Slides</a> | 
-    <a href="https://merrickmath.github.io/MerrickMath.github.io-APSTAT/materials/Unit5QuickNotes.pdf">Quick Notes</a>
+  <li><strong>Assignment 5:</strong>
+    <a href="https://merrickmath.github.io/Datascience/assignments/Assignment5.pdf">Assignment 5</a> |
+    <a href="https://merrickmath.github.io/Datascience/assignments/Assignment5Solutions.pdf">Assignment 5 Solutions</a>
   </li>
-  <li><strong>Unit 6:</strong> 
-    <a href="https://merrickmath.github.io/MerrickMath.github.io-APSTAT/materials/Unit6.pdf">Slides</a> | 
-    <a href="https://merrickmath.github.io/MerrickMath.github.io-APSTAT/materials/Unit6QuickNotes.pdf">Quick Notes</a>
+  <li><strong>Assignment 6:</strong>
+    <a href="https://merrickmath.github.io/Datascience/assignments/Assignment6.pdf">Assignment 6</a> |
+    <a href="https://merrickmath.github.io/Datascience/assignments/Assignment6Solutions.pdf">Assignment 6 Solutions</a>
   </li>
-  <li><strong>Unit 7:</strong> 
-    <a href="https://merrickmath.github.io/MerrickMath.github.io-APSTAT/materials/Unit7.pdf">Slides</a> | 
-    <a href="https://merrickmath.github.io/MerrickMath.github.io-APSTAT/materials/Unit7QuickNotes.pdf">Quick Notes</a>
+  <li><strong>Assignment 7:</strong>
+    <a href="https://merrickmath.github.io/Datascience/assignments/Assignment7.pdf">Assignment 7</a> |
+    <a href="https://merrickmath.github.io/Datascience/assignments/Assignment7Solutions.pdf">Assignment 7 Solutions</a>
   </li>
-  <li><strong>Unit 8:</strong> 
-    <a href="https://merrickmath.github.io/MerrickMath.github.io-APSTAT/materials/Unit8.pdf">Slides</a> | 
-    <a href="https://merrickmath.github.io/MerrickMath.github.io-APSTAT/materials/Unit8QuickNotes.pdf">Quick Notes</a>
+  <li><strong>Assignment 8:</strong>
+    <a href="https://merrickmath.github.io/Datascience/assignments/Assignment8.pdf">Assignment 8</a> |
+    <a href="https://merrickmath.github.io/Datascience/assignments/Assignment8Solutions.pdf">Assignment 8 Solutions</a>
   </li>
-  <li><strong>Unit 9:</strong> 
-    <a href="https://merrickmath.github.io/MerrickMath.github.io-APSTAT/materials/Unit9.pdf">Slides</a> | 
-    <a href="https://merrickmath.github.io/MerrickMath.github.io-APSTAT/materials/Unit9QuickNotes.pdf">Quick Notes</a>
+  <li><strong>Assignment 9:</strong>
+    <a href="https://merrickmath.github.io/Datascience/assignments/Assignment9.pdf">Assignment 9</a> |
+    <a href="https://merrickmath.github.io/Datascience/assignments/Assignment9Solutions.pdf">Assignment 9 Solutions</a>
+  </li>
+  <li><strong>Assignment 10:</strong>
+    <a href="https://merrickmath.github.io/Datascience/assignments/Assignment10.pdf">Assignment 10</a> |
+    <a href="https://merrickmath.github.io/Datascience/assignments/Assignment10Solutions.pdf">Assignment 10 Solutions</a>
   </li>
 </ul>
+
 
 
 
 <!-- Resources -->
 <h2 id="resources">Class Resources</h2>
 <ul>
-  <li><a href="https://merrickmath.github.io/MerrickMath.github.io-APSTAT/materials/PastExamsByUnit.html">Past Exams Problems Tagged By Unit</a></li>
   <li><a href="https://drive.google.com/drive/folders/1SAwh7_BTf8Mkrvddb032jgdsNS6mII9f?usp=sharing">Class Datasets</a></li>
-  <li><a href="https://www.jbstatistics.com">JBStatistics</a></li>
-  <li><a href="https://www.khanacademy.org/math/ap-statistics">Khan Academy: AP Statistics</a></li>
-  <li><a href="https://www.stapplet.com">Statistics Apps (Stapplet)</a></li>
   <li><a href="https://www.r-project.org">R download</a></li>
   <li><a href="https://www.rstudio.com/products/rstudio/download/">R Studio download</a></li>
 </ul>
