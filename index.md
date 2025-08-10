@@ -21,33 +21,6 @@
 </section>
 
 
-<!-- AP Exam -->
-<h2 id="exam">The Exam</h2>
-<div style="border-left:4px solid #2f855a;background:#f6fffa;padding:.75rem 1rem;border-radius:6px">
-  <p style="margin:0">
-    <strong>AP Statistics Exam:</strong> <u>Thursday, May 7, 2026 at 12:00 PM local time</u>.
-    See the official page for details and updates.
-  </p>
-  <p style="margin:.4rem 0 0">
-    <a href="https://apcentral.collegeboard.org/courses/ap-statistics/exam">Detailed exam information</a>
-  </p>
-</div>
-
-<!-- Clear static expectations -->
-<h3 style="margin-top:1rem">What to Expect on Exam Day</h3>
-<ul>
-  <li><strong>Section I:</strong> 40 multiple-choice questions — 90 minutes (50% of score)</li>
-  <li><strong>Section II:</strong> 6 free-response questions (including the Investigative Task) — 90 minutes (50% of score)</li>
-  <li>Bring an approved calculator and extra pencils.</li>
-</ul>
-
-<!-- Timeline -->
-<h2 id="timeline">Timeline & Homework</h2>
-<p><em>Target windows for watching videos and completing assigned problems.</em></p>
-<ul>
-  <li><strong>Sept 5 – Sept 20:</strong> Unit 1</li>
-</ul>
-
 <!-- Assessments -->
 <h2 id="tests">Tests</h2>
 <p><em>Approved Calculators are allowed on all tests.</em></p>
