@@ -52,13 +52,13 @@
         </label>
         <button id="regen" class="chip">Regenerate</button>
       </div>
-      <div class="mini-note">Demo generator: for group <code>g</code> (0…k−1), mean ≈ <code>(g − (k−1)/2) × separation</code> plus shape-specific noise.</div>
+      <div class="mini-note">Generator: for group <code>g</code> (0…k−1), mean ≈ <code>(g − (k−1)/2) × separation</code> + shape-specific noise.</div>
     </div>
   </header>
 
   <main class="wrap">
     <section class="panel">
-      <p class="lead">We’re exploring a single <strong>numeric</strong> response (e.g., score, height) broken down by a <strong>categorical</strong> factor (e.g., group, treatment). Use these plots to compare <em>centers</em>, <em>spread</em>, <em>shape</em>, and <em>outliers</em> across groups.</p>
+      <p class="lead">We compare a single <strong>numeric</strong> response across a <strong>categorical</strong> factor. Use these plots to inspect <em>centers</em>, <em>spread</em>, <em>shape</em>, and <em>outliers</em> by group.</p>
     </section>
 
     <!-- 1) Grouped Box Plots -->
@@ -113,14 +113,7 @@ ggplot(df, aes(group, y, color = group)) +
       <h2>4) Raincloud plots (half-violin + box + jitter)</h2>
       <div id="viz-rain" class="viz" role="img" aria-label="Raincloud plots"></div>
       <details><summary>R / ggplot2</summary>
-<pre><code class="language-r"># Raincloud pattern with half-violin + box + jitter
-ggplot(df, aes(y = group, x = y, fill = group)) +
-  ggridges::geom_density_ridges(
-    jittered_points = TRUE, scale = 0.9, alpha = 0.7, point_alpha = 0.25) +
-  labs(title = "Raincloud-style ridges (alt)") +
-  theme_minimal()
-
-# Or manual: half-violin + box + jitter
+<pre><code class="language-r"># Raincloud with ggdist (half-violin + box + jitter)
 ggplot(df, aes(y = group, x = y, fill = group)) +
   ggdist::stat_halfeye(adjust = 0.7, justification = -0.2, .width = 0, point_colour = NA) +
   geom_boxplot(width = .15, outlier.shape = NA) +
@@ -206,14 +199,12 @@ ggplot(summ, aes(group, mean, color = group)) +
   <script>
     const W=940,H=340,M={t:20,r:20,b:40,l:50};
     const innerW=W-M.l-M.r, innerH=H-M.t-M.b;
-    const SMALL_H=220, SMALL_INNER_H=SMALL_H-M.t-M.b;
     const $=sel=>document.querySelector(sel);
     const colors = d3.schemeTableau10;
 
     // ---------- Data generator ----------
     function randn(n, m=0, s=1){ return d3.range(n).map(()=> d3.randomNormal(m,s)()); }
     function rlogn(n, mu=0, sd=0.5, shift=0){
-      // center roughly then shift by mu
       const z = d3.range(n).map(()=> d3.randomLogNormal(0, sd)());
       const med = d3.quantile(z, 0.5);
       return z.map(v=> (v - med) + mu + shift);
@@ -259,8 +250,9 @@ ggplot(summ, aes(group, mean, color = group)) +
       const lo = s.find(v => v >= q1 - 1.5*iqr) ?? s[0];
       const hi = [...s].reverse().find(v => v <= q3 + 1.5*iqr) ?? s[s.length-1];
       const mean = d3.mean(s);
-      const se = (d3.deviation(s) || 0)/Math.sqrt(s.length);
-      return {q1, med, q3, iqr, lo, hi, mean, se, n: s.length, outliers: s.filter(v => v<lo || v>hi)};
+      const sd = d3.deviation(s) || 0;
+      const se = sd/Math.sqrt(s.length);
+      return {q1, med, q3, iqr, lo, hi, mean, sd, se, n: s.length, outliers: s.filter(v => v<lo || v>hi)};
     }
 
     // ---------- Frames ----------
@@ -329,13 +321,13 @@ ggplot(summ, aes(group, mean, color = group)) +
 
         const x0 = x(gi.group) + x.bandwidth()/2;
         const path = d3.path();
-        // upper (right)
+        // right half
         for(let i=0;i<dens.length;i++){
           const xx = x0 + scaleW(dens[i][1]);
           const yy = y(dens[i][0]);
           if(i===0) path.moveTo(xx, yy); else path.lineTo(xx, yy);
         }
-        // lower (left)
+        // left half
         for(let i=dens.length-1;i>=0;i--){
           const xx = x0 - scaleW(dens[i][1]);
           const yy = y(dens[i][0]);
@@ -347,7 +339,7 @@ ggplot(summ, aes(group, mean, color = group)) +
       });
     }
 
-    // Beeswarm using force simulation per group (numeric on y, categories on x)
+    // Beeswarm using force simulation per group
     function drawBeeswarm(data){
       const groups = byGroup(data);
       const cats = groups.map(d=>d.group);
@@ -369,8 +361,7 @@ ggplot(summ, aes(group, mean, color = group)) +
           .force("y", d3.forceY(d => d.y).strength(1))
           .force("collide", d3.forceCollide(r+0.5))
           .stop();
-        for(let i=0;i<200;i++) sim.tick(); // settle
-
+        for(let i=0;i<200;i++) sim.tick();
         g.append("g").selectAll("circle").data(nodes).enter().append("circle")
           .attr("cx", d=>d.x).attr("cy", d=>d.y).attr("r", r)
           .attr("fill", colors[idx%colors.length]).attr("opacity",0.45);
@@ -399,7 +390,7 @@ ggplot(summ, aes(group, mean, color = group)) +
 
         const y0 = y(gi.group) + y.bandwidth()/2;
         const path = d3.path();
-        // half violin (on top side)
+        // half violin
         path.moveTo(x(dens[0][0]), y0);
         dens.forEach(d=>{
           const xx = x(d[0]);
@@ -412,7 +403,7 @@ ggplot(summ, aes(group, mean, color = group)) +
         g.append("path").attr("d", path.toString())
           .attr("fill", colors[idx%colors.length]).attr("opacity",0.75).attr("stroke","#ffffff");
 
-        // box
+        // box + median
         const s = stats(vals);
         g.append("rect")
           .attr("x", x(s.q1)).attr("y", y0 - y.bandwidth()*0.10)
@@ -420,6 +411,7 @@ ggplot(summ, aes(group, mean, color = group)) +
           .attr("fill", "#ffffff").attr("stroke", "#0f172a").attr("opacity",0.9);
         g.append("line").attr("x1", x(s.med)).attr("x2", x(s.med))
           .attr("y1", y0 - y.bandwidth()*0.10).attr("y2", y0 + y.bandwidth()*0.10).attr("stroke","#0f172a").attr("stroke-width",2);
+
         // jittered points
         const jitter = d3.randomNormal(0, y.bandwidth()*0.08);
         g.append("g").selectAll("circle").data(vals).enter().append("circle")
@@ -437,12 +429,10 @@ ggplot(summ, aes(group, mean, color = group)) +
 
       const {g,innerW,innerH} = frame('#viz-density');
       const x = d3.scaleLinear().domain(xdom).nice().range([0, innerW]);
-      const y = d3.scaleLinear().range([innerH,0]); // domain set after computing densities
+      const y = d3.scaleLinear().range([innerH,0]);
       g.select('.x-axis').call(d3.axisBottom(x));
 
-      // compute densities & find max
-      let allD = [];
-      let ymax = 0;
+      let allD = [], ymax = 0;
       groups.forEach((gi)=>{
         const vals = gi.values;
         const bw = 1.06 * (d3.deviation(vals)||1) * Math.pow(vals.length, -1/5);
@@ -464,7 +454,7 @@ ggplot(summ, aes(group, mean, color = group)) +
       });
     }
 
-    // Ridgeline densities (stacked by group)
+    // Ridgeline densities
     function drawRidgeline(data){
       const groups = byGroup(data);
       const cats = groups.map(d=>d.group);
@@ -498,38 +488,73 @@ ggplot(summ, aes(group, mean, color = group)) +
       });
     }
 
-    // Means with CI
+    // === REMADE: Means with 95% CI (robust, with caps, CI-safe y-domain) ===
     function drawMeansCI(data){
-      const groups = byGroup(data).map(d=> ({group:d.group, ...stats(d.values)}));
-      const cats = groups.map(d=>d.group);
-      const all = data.map(d=>d.y);
-      const ydom = d3.extent(all); const pad=(ydom[1]-ydom[0])*0.08; ydom[0]-=pad; ydom[1]+=pad;
+      // Summaries
+      const grouped = byGroup(data).map(d => ({group:d.group, ...stats(d.values)}));
+      const cats = grouped.map(d=>d.group);
+
+      // Compute CI extents for domain
+      const ciExtents = grouped.flatMap(g => [g.mean - 1.96*g.se, g.mean + 1.96*g.se]);
+      const rawExtents = data.map(d=>d.y);
+      let yMin = Math.min(...rawExtents, ...ciExtents);
+      let yMax = Math.max(...rawExtents, ...ciExtents);
+      const pad = (yMax - yMin) * 0.08 || 1;
+      yMin -= pad; yMax += pad;
 
       const {g,innerW,innerH} = frame('#viz-mean');
       const x = d3.scaleBand().domain(cats).range([0, innerW]).padding(0.4);
-      const y = d3.scaleLinear().domain(ydom).nice().range([innerH,0]);
+      const y = d3.scaleLinear().domain([yMin, yMax]).nice().range([innerH,0]);
+
       g.select('.x-axis').call(d3.axisBottom(x));
       g.select('.y-axis').call(d3.axisLeft(y));
 
-      groups.forEach((gi, idx)=>{
-        const ci = 1.96 * gi.se;
+      // Draw error bars with caps + mean point
+      grouped.forEach((gi, idx)=>{
         const cx = x(gi.group) + x.bandwidth()/2;
+        const ci = 1.96 * gi.se;
+        const y0 = y(gi.mean - ci), y1 = y(gi.mean + ci);
+
+        // vertical CI line
         g.append("line")
           .attr("x1", cx).attr("x2", cx)
-          .attr("y1", y(gi.mean-ci)).attr("y2", y(gi.mean+ci))
-          .attr("stroke", colors[idx%colors.length]).attr("stroke-width", 3).attr("opacity",0.9);
-        g.append("circle").attr("cx", cx).attr("cy", y(gi.mean)).attr("r", 4.5)
-          .attr("fill", colors[idx%colors.length]).attr("stroke","#0f172a").attr("stroke-width",1);
+          .attr("y1", y0).attr("y2", y1)
+          .attr("stroke", colors[idx%colors.length])
+          .attr("stroke-width", 3)
+          .attr("opacity", 0.95);
+
+        // caps
+        const capW = x.bandwidth()*0.35;
+        g.append("line")
+          .attr("x1", cx - capW/2).attr("x2", cx + capW/2)
+          .attr("y1", y0).attr("y2", y0)
+          .attr("stroke", colors[idx%colors.length])
+          .attr("stroke-width", 3)
+          .attr("opacity", 0.95);
+        g.append("line")
+          .attr("x1", cx - capW/2).attr("x2", cx + capW/2)
+          .attr("y1", y1).attr("y2", y1)
+          .attr("stroke", colors[idx%colors.length])
+          .attr("stroke-width", 3)
+          .attr("opacity", 0.95);
+
+        // mean point
+        g.append("circle")
+          .attr("cx", cx).attr("cy", y(gi.mean)).attr("r", 5)
+          .attr("fill", colors[idx%colors.length])
+          .attr("stroke", "#0f172a")
+          .attr("stroke-width", 1.2);
       });
     }
 
-    // Faceted histograms (row of small multiples)
+    // Faceted histograms (small multiples)
     function drawFacets(data){
       const groups = byGroup(data);
       const cats = groups.map(d=>d.group);
       const all = data.map(d=>d.y);
       const xdom = d3.extent(all);
-      const width = W, height = 200, per = Math.min(5, cats.length);
+
+      const width = W, height = 200;
       const cellW = (width - M.l - M.r) / cats.length;
 
       const root = d3.select('#viz-facets').html("");
@@ -548,7 +573,6 @@ ggplot(summ, aes(group, mean, color = group)) +
           .attr("width", d=>Math.max(0, x(d.x1)-x(d.x0)-2)).attr("height", d=>innerH - y(d.length))
           .attr("fill", colors[idx%colors.length]).attr("opacity",0.8).attr("stroke","#ffffff");
 
-        // axes (mini)
         gg.append("g").attr("transform", `translate(0,${innerH})`)
           .call(d3.axisBottom(x).ticks(4)).selectAll("text").style("font-size","10px");
         gg.append("text").attr("x", (idx*cellW + (idx+1)*cellW)/2 - 10).attr("y", -6)
@@ -571,7 +595,7 @@ ggplot(summ, aes(group, mean, color = group)) +
       drawRaincloud(data);
       drawOverlaidDensities(data);
       drawRidgeline(data);
-      drawMeansCI(data);
+      drawMeansCI(data);       // <— remade version
       drawFacets(data);
     }
 
