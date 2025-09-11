@@ -23,6 +23,7 @@
     pre{background:var(--code);border:1px solid var(--border);border-radius:10px;padding:12px;overflow:auto}
     .controls{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
     .footer{margin:28px 0 8px;color:var(--muted);font-size:14px}
+    .mini-note{color:var(--muted);font-size:14px;margin-top:6px}
   </style>
 </head>
 <body>
@@ -31,23 +32,31 @@
       <h1>Visualizing Two Numeric Variables in R</h1>
       <div class="controls">
         <span class="chip">Live demo data</span>
-        <label>n = <input id="n" type="range" min="50" max="2000" value="500" step="50"> <strong id="nval">500</strong></label>
+        <label>n = <input id="n" type="range" min="50" max="5000" value="800" step="50"> <strong id="nval">800</strong></label>
+        <label>Noise (sd ε) = <input id="noise" type="range" min="0.1" max="2.5" value="0.8" step="0.1"> <strong id="noiseval">0.8</strong></label>
         <button id="regen" class="chip">Regenerate</button>
       </div>
+      <div class="mini-note">Data generating process: <code>y = 1.5·x + ε</code>, where <code>x ~ N(0,1)</code> and <code>ε ~ N(0, sd)</code>.</div>
     </div>
   </header>
 
   <main class="wrap">
     <section class="panel">
-      <p class="lead">When we have <strong>two numeric variables</strong> (say <code>x</code> and <code>y</code>), the key task is to visualize their <em>relationship</em>: trends, clusters, correlation, outliers. The most fundamental tool is the <strong>scatter plot</strong>, but there are useful variants when the dataset is large or noisy.</p>
+      <p class="lead">With <strong>two numeric variables</strong> (say <code>x</code> and <code>y</code>), we visualize their <em>relationship</em>: trends, clusters, correlation, and outliers. Start with a <strong>scatter plot</strong>, add a <strong>trend line</strong> for structure, and switch to <strong>hexbin</strong> when there’s heavy overplotting.</p>
     </section>
 
     <section id="scatter" class="panel">
       <h2>1) Scatter plot</h2>
       <div id="viz-scatter" class="viz" role="img" aria-label="Scatter plot"></div>
+      <div id="corr-readout" class="mini-note"></div>
       <details><summary>R / ggplot2</summary>
 <pre><code class="language-r">library(tidyverse)
-df <- tibble(x = rnorm(500), y = 1.5*x + rnorm(500, sd=0.8))
+set.seed(1)
+n <- 800
+x <- rnorm(n)
+y <- 1.5*x + rnorm(n, sd = 0.8)
+df <- tibble(x, y)
+
 ggplot(df, aes(x, y)) +
   geom_point(alpha = 0.6, color = "#2563eb") +
   labs(title = "Scatter plot", x = "x", y = "y") +
@@ -56,24 +65,30 @@ ggplot(df, aes(x, y)) +
     </section>
 
     <section id="smooth" class="panel">
-      <h2>2) Adding a smoother</h2>
-      <p>Scatter plots can be enhanced with regression or smooth trend lines (linear, LOESS, GAM). These highlight patterns that may be hidden in noise.</p>
-      <div id="viz-smooth" class="viz" role="img" aria-label="Scatter with smoother"></div>
+      <h2>2) Scatter + smoother</h2>
+      <p>Add a model or smoother (linear, LOESS, GAM) to reveal patterns hidden by noise. Below we show a linear fit.</p>
+      <div id="viz-smooth" class="viz" role="img" aria-label="Scatter with regression line"></div>
       <details><summary>R / ggplot2</summary>
 <pre><code class="language-r">ggplot(df, aes(x, y)) +
   geom_point(alpha = 0.5, color = "#2563eb") +
   geom_smooth(method = "lm", se = TRUE, color = "#dc2626") +
-  labs(title = "Scatter with linear regression line") +
+  labs(title = "Scatter with linear regression line", x = "x", y = "y") +
+  theme_minimal()
+
+# LOESS (nonlinear trend)
+ggplot(df, aes(x, y)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(method = "loess", se = TRUE) +
   theme_minimal()</code></pre>
       </details>
     </section>
 
     <section id="hexbin" class="panel">
-      <h2>3) Dealing with many points: hexbin / 2D density</h2>
-      <p>When there are thousands of points, scatter plots suffer from overplotting. Alternatives: <strong>hexbin plots</strong> (bin into hexagons) or <strong>2D density contours</strong>.</p>
+      <h2>3) Large n: hexbin / 2D density</h2>
+      <p>With thousands of points, scatter plots overplot. <strong>Hexbin</strong> discretizes space into hexagons and colors by count. (Alternative: 2D density contours.)</p>
       <div id="viz-hex" class="viz" role="img" aria-label="Hexbin plot"></div>
       <details><summary>R / ggplot2</summary>
-<pre><code class="language-r"># Hexbin
+<pre><code class="language-r"># Hexbin (requires hexbin package usually installed with ggplot2)
 ggplot(df, aes(x, y)) +
   geom_hex() +
   coord_equal() +
@@ -81,103 +96,136 @@ ggplot(df, aes(x, y)) +
 
 # 2D density contours
 ggplot(df, aes(x, y)) +
-  geom_point(alpha = 0.2) +
+  geom_point(alpha = 0.15) +
   geom_density_2d(color = "red") +
   theme_minimal()</code></pre>
       </details>
     </section>
 
     <section id="cor" class="panel">
-      <h2>4) Correlation coefficient</h2>
-      <p>A numeric summary: Pearson's <code>r</code> measures linear association (−1 to +1). Always pair correlation with a plot, since <em>nonlinear</em> relationships can fool correlation.</p>
-<pre><code class="language-r">cor(df$x, df$y)   # Pearson correlation
-cor(df$x, df$y, method = "spearman") # Spearman (rank-based)</code></pre>
+      <h2>4) Correlation</h2>
+      <p>Pearson’s <code>r</code> (−1…+1) summarizes linear association. Always pair with a plot—nonlinear patterns can fool correlation.</p>
+<pre><code class="language-r">cor(df$x, df$y)                 # Pearson correlation
+cor(df$x, df$y, method="spearman")  # Spearman (rank-based)</code></pre>
     </section>
 
     <section class="panel">
       <h2>Pitfalls & tips</h2>
       <ul>
         <li><strong>Overplotting:</strong> Use alpha blending or hexbin/density plots.</li>
-        <li><strong>Outliers:</strong> Can strongly affect regression and correlation.</li>
-        <li><strong>Nonlinear patterns:</strong> Check LOESS/GAM smoothers.</li>
-        <li><strong>Units & scales:</strong> If variables have very different scales, consider standardization.</li>
+        <li><strong>Outliers:</strong> They can dominate regression and correlation; inspect residuals.</li>
+        <li><strong>Nonlinearity:</strong> Try LOESS/GAM smoothers; check residual patterns.</li>
+        <li><strong>Scale/units:</strong> If scales differ a lot, consider standardizing; always label units.</li>
       </ul>
     </section>
 
     <div class="footer">Made with ❤️ for R users. Copy, tweak, and ship.</div>
   </main>
 
+  <!-- Load D3 and the hexbin plugin (required for hexbin). Order matters: plugin after D3. -->
   <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3-hexbin@0.2"></script>
   <script>
-    const W=680,H=300,M={t:20,r:20,b:35,l:40};
+    const W=680,H=300,M={t:20,r:20,b:35,l:45};
     const innerW=W-M.l-M.r, innerH=H-M.t-M.b;
     const $=sel=>document.querySelector(sel);
 
-    function sampleData(n){
-      const x = d3.range(n).map(()=> d3.randomNormal(0,1)());
-      const y = x.map(v=> 1.5*v + d3.randomNormal(0,0.8)());
-      return x.map((v,i)=>({x:v,y:y[i]}));
+    function sampleData(n, noise=0.8){
+      const xn = d3.range(n).map(()=> d3.randomNormal(0,1)());
+      const eps = d3.range(n).map(()=> d3.randomNormal(0,noise)());
+      const yn = xn.map((v,i)=> 1.5*v + eps[i]);
+      return xn.map((v,i)=>({x:v, y:yn[i]}));
     }
-    function frame(sel,xlab,ylab){
+    function axesFrame(sel){
       const svg=d3.select(sel).html("")
         .append("svg").attr("viewBox",`0 0 ${W} ${H}`);
       const g=svg.append("g").attr("transform",`translate(${M.l},${M.t})`);
       g.append("g").attr("class","x-axis").attr("transform",`translate(0,${innerH})`);
       g.append("g").attr("class","y-axis");
-      return {g,svg};
+      return {svg,g};
     }
+    function pearsonR(data){
+      const n=data.length;
+      const mx=d3.mean(data,d=>d.x), my=d3.mean(data,d=>d.y);
+      const sx=Math.sqrt(d3.mean(data,d=>(d.x-mx)**2));
+      const sy=Math.sqrt(d3.mean(data,d=>(d.y-my)**2));
+      const cov=d3.mean(data,d=>(d.x-mx)*(d.y-my));
+      return cov/(sx*sy);
+    }
+
     function renderAll(){
       const n=+$('#n').value; $('#nval').textContent=n;
-      const data=sampleData(n);
+      const noise=+$('#noise').value; $('#noiseval').textContent=noise.toFixed(1);
+      const data=sampleData(n, noise);
+
       const xdom=d3.extent(data,d=>d.x), ydom=d3.extent(data,d=>d.y);
       const xScale=d3.scaleLinear().domain(xdom).nice().range([0,innerW]);
       const yScale=d3.scaleLinear().domain(ydom).nice().range([innerH,0]);
 
-      // Scatter
+      // 1) Scatter
       (function(){
-        const {g}=frame('#viz-scatter');
+        const {g}=axesFrame('#viz-scatter');
         g.select('.x-axis').call(d3.axisBottom(xScale));
         g.select('.y-axis').call(d3.axisLeft(yScale));
         g.selectAll('circle').data(data).enter().append('circle')
           .attr('cx',d=>xScale(d.x)).attr('cy',d=>yScale(d.y))
           .attr('r',3).attr('fill','#2563eb').attr('opacity',0.6);
+        const r = pearsonR(data);
+        $('#corr-readout').textContent = `Pearson r ≈ ${r.toFixed(3)} (live)`;
       })();
 
-      // Scatter with regression line
+      // 2) Scatter + linear regression line
       (function(){
-        const {g}=frame('#viz-smooth');
+        const {g}=axesFrame('#viz-smooth');
         g.select('.x-axis').call(d3.axisBottom(xScale));
         g.select('.y-axis').call(d3.axisLeft(yScale));
         g.selectAll('circle').data(data).enter().append('circle')
           .attr('cx',d=>xScale(d.x)).attr('cy',d=>yScale(d.y))
           .attr('r',2.5).attr('fill','#2563eb').attr('opacity',0.5);
-        // Simple linear regression
-        const xmean=d3.mean(data,d=>d.x), ymean=d3.mean(data,d=>d.y);
-        const slope=d3.sum(data,d=>(d.x-xmean)*(d.y-ymean))/d3.sum(data,d=>(d.x-xmean)**2);
-        const intercept=ymean-slope*xmean;
-        const linePts=[xdom[0],xdom[1]].map(x=>({x,y:slope*x+intercept}));
-        g.append('line').attr('x1',xScale(linePts[0].x)).attr('y1',yScale(linePts[0].y))
-          .attr('x2',xScale(linePts[1].x)).attr('y2',yScale(linePts[1].y))
-          .attr('stroke','#dc2626').attr('stroke-width',2);
+
+        // OLS line y = a + b x
+        const xbar=d3.mean(data,d=>d.x), ybar=d3.mean(data,d=>d.y);
+        const b = d3.sum(data,d=>(d.x-xbar)*(d.y-ybar)) / d3.sum(data,d=>(d.x-xbar)**2);
+        const a = ybar - b*xbar;
+        const pts=[xdom[0], xdom[1]].map(x=>({x, y:a + b*x}));
+        g.append('line')
+          .attr('x1', xScale(pts[0].x)).attr('y1', yScale(pts[0].y))
+          .attr('x2', xScale(pts[1].x)).attr('y2', yScale(pts[1].y))
+          .attr('stroke', '#dc2626').attr('stroke-width', 2);
       })();
 
-      // Hexbin (approximate using bin2d)
+      // 3) Hexbin (requires d3-hexbin plugin)
       (function(){
-        const {g}=frame('#viz-hex');
-        const hexbin=d3.hexbin().x(d=>xScale(d.x)).y(d=>yScale(d.y)).radius(12).extent([[0,0],[innerW,innerH]]);
-        const bins=hexbin(data);
-        const c=d3.scaleSequential(d3.interpolateBlues).domain([0,d3.max(bins,d=>d.length)]);
+        const sel = '#viz-hex';
+        d3.select(sel).selectAll("*").remove();
+        const svg = d3.select(sel).append("svg").attr("viewBox", `0 0 ${W} ${H}`);
+        const g = svg.append("g").attr("transform", `translate(${M.l},${M.t})`);
+
+        g.append("g").attr("class","x-axis").attr("transform",`translate(0,${innerH})`).call(d3.axisBottom(xScale));
+        g.append("g").attr("class","y-axis").call(d3.axisLeft(yScale));
+
+        const hex = d3.hexbin()
+          .x(d => xScale(d.x))
+          .y(d => yScale(d.y))
+          .radius(12)
+          .extent([[0,0],[innerW,innerH]]);
+
+        const bins = hex(data);
+        const maxCount = d3.max(bins, d => d.length) || 1;
+        const color = d3.scaleSequential(d3.interpolateBlues).domain([0, maxCount]);
+
         g.append("g").selectAll("path").data(bins).enter().append("path")
-          .attr("d",hexbin.hexagon())
-          .attr("transform",d=>`translate(${d.x},${d.y})`)
-          .attr("fill",d=>c(d.length))
-          .attr("stroke","white");
-        g.select('.x-axis').call(d3.axisBottom(xScale));
-        g.select('.y-axis').call(d3.axisLeft(yScale));
+          .attr("d", hex.hexagon())
+          .attr("transform", d => `translate(${d.x},${d.y})`)
+          .attr("fill", d => color(d.length))
+          .attr("stroke", "white")
+          .attr("stroke-width", 0.6);
       })();
     }
-    document.getElementById('n').addEventListener('input',renderAll);
-    document.getElementById('regen').addEventListener('click',renderAll);
+
+    document.getElementById('n').addEventListener('input', renderAll);
+    document.getElementById('noise').addEventListener('input', renderAll);
+    document.getElementById('regen').addEventListener('click', renderAll);
     renderAll();
   </script>
 </body>
