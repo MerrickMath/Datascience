@@ -32,58 +32,29 @@ lego |>
     last_year  = max(year, na.rm = TRUE)
   )
 
-ggplot(lego, aes(x = pieces)) +
+lego %>% ggplot(aes(x = pieces)) +
   geom_histogram(bins = 30, color = "white", fill = "steelblue") +
   labs(title = "Distribution of LEGO Set Piece Counts",
        x = "Pieces", y = "Count") 
 
 # Q2 — Missing data overview ---------------------------------
-pct <- function(x) round(100 * x, 1)
+missing <- lego %>% is.na() %>% colSums()
+missing_frame <- data.frame(columns = names(missing), 
+                            na_count = as.numeric(missing), 
+                            na_percent = as.numeric(missing)/dim(lego)[1])
+print(missing_frame)
 
-missing_overview <- lego |>
-  summarise(
-    n = n(),
-    missing_name   = sum(is.na(name)),
-    missing_theme  = sum(is.na(theme)),
-    missing_year   = sum(is.na(year)),
-    missing_pieces = sum(is.na(pieces)),
-    missing_usd    = sum(is.na(usd_msrp))
-  ) |>
-  mutate(
-    pct_name   = pct(missing_name / n),
-    pct_theme  = pct(missing_theme / n),
-    pct_year   = pct(missing_year / n),
-    pct_pieces = pct(missing_pieces / n),
-    pct_usd    = pct(missing_usd / n)
-  )
-
-print(missing_overview)
-
-miss_long <- tibble(
-  variable = c("name","theme","year","pieces","usd_msrp"),
-  pct_missing = c(
-    pct(mean(is.na(lego$name))),
-    pct(mean(is.na(lego$theme))),
-    pct(mean(is.na(lego$year))),
-    pct(mean(is.na(lego$pieces))),
-    pct(mean(is.na(lego$usd_msrp)))
-  )
-)
-
-ggplot(miss_long, aes(x = variable, y = pct_missing)) +
-  geom_col(fill = "tomato") +
-  labs(title = "Percent Missing by Variable",
-       x = "Variable", y = "Percent missing") +
-  ylim(0, 100)
+missing_frame %>% ggplot(aes(x=columns, y=na_percent)) + 
+  geom_bar(stat='identity') + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
 # Q3 — Value (PPP) -------------------------------------------
 # Naive definition ignoring NAS
 # lego |> mutate(ppp = usd_msrp/pieces)
+lego <- lego %>% filter(pieces>0) %>% 
+  mutate(ppp=usd_msrp/pieces, na.rm=TRUE) 
 
-lego <- lego |>
-  mutate(ppp = ifelse(!is.na(usd_msrp) & !is.na(pieces) & pieces > 0,
-                      usd_msrp / pieces, NA_real_))
 lego |>
   filter(pieces >= 100, is.finite(ppp)) |>
   arrange(ppp) |>
@@ -100,7 +71,7 @@ ggplot(lego |> filter(!is.na(ppp)), aes(x = ppp)) +
 lego |>
   arrange(desc(ppp)) |>
   select(name, theme, year, pieces, usd_msrp, ppp) |>
-  print(n=100)
+  print(n=10)
 
 # Optional view with outlier trim for cleaner shape
 lego_trim <- lego |> filter(!is.na(ppp), ppp > 0, ppp < 1.5)
@@ -149,12 +120,16 @@ pair |> group_by(theme) |>
     avg_ppp    = mean(ppp,      na.rm = TRUE),
     .groups = "drop"
   )
-
+# Compared Distribution Plots
+# Boxplot 
 ggplot(pair |> filter(!is.na(usd_msrp)),
        aes(x = theme, y = usd_msrp)) +
   geom_boxplot(fill = "skyblue") +
   labs(title = "Price by Theme (choose two)",
        x = "Theme", y = "Price (USD)")
+# Histograms
+pair %>% ggplot(aes(x=ppp)) + geom_histogram() + 
+  facet_wrap(~theme, ncol=1)
 
 # Q6 — Pieces vs price ---------------------------------------
 lego_complete_price <- lego |>
@@ -170,14 +145,15 @@ cor(lego_complete_price$pieces, lego_complete_price$usd_msrp)
 
 # Q7 — Trends over time --------------------------------------
 yearly <- lego |> 
+  filter(!is.na(year), !is.na(ppp)) |>
   group_by(year) |>
   summarise(
     avg_pieces = mean(pieces, na.rm = TRUE),
     avg_price  = mean(usd_msrp, na.rm = TRUE),
     avg_ppp    = mean(ppp, na.rm = TRUE),
+    med_ppp    = median(ppp, na.rm = TRUE),
     sets       = n(),
-  ) |>
-  filter(!is.na(year))
+  ) 
 
 ggplot(yearly, aes(x = year, y = avg_pieces)) +
   geom_line() + geom_point() +
@@ -185,15 +161,19 @@ ggplot(yearly, aes(x = year, y = avg_pieces)) +
        x = "Year", y = "Average pieces")
 
 ggplot(yearly, aes(x = year, y = avg_price)) +
-  geom_line() + geom_point() +
+  geom_line() +
   labs(title = "Average Price by Year",
        x = "Year", y = "Average USD")
 
 ggplot(yearly, aes(x = year, y = avg_ppp)) +
-  geom_line() + geom_point() +
+  geom_line() + 
   labs(title = "Average Price per Piece (PPP) by Year",
        x = "Year", y = "Average USD per piece")
 
+ggplot(yearly, aes(x = year, y = med_ppp)) +
+  geom_line() + 
+  labs(title = "Median Price per Piece (PPP) by Year",
+       x = "Year", y = "Average USD per piece")
 
 ### Seems totally contrary to LEGO enthusiests beliefs, lets only look at themed sets: 
 yearly <- lego |> 
@@ -205,7 +185,7 @@ yearly <- lego |>
     avg_ppp    = mean(ppp, na.rm = TRUE),
     sets       = n(),
   ) |>
-  filter(!is.na(year))
+  filter(!is.na(yearly))
 
 ggplot(yearly, aes(x = year, y = avg_pieces, col=theme)) +
   geom_line() + geom_point() +
@@ -221,5 +201,21 @@ ggplot(yearly, aes(x = year, y = avg_ppp, col=theme)) +
   geom_line() + geom_point() +
   labs(title = "Average Price per Piece (PPP) by Year",
        x = "Year", y = "Average USD per piece")
+
+lego %>% filter(!is.na(usd_msrp), !is.na(year)) %>%  
+  ggplot(aes(x=year, y=usd_msrp)) + geom_point(alpha=0.3) 
+
+lego %>% filter(!is.na(usd_msrp))  %>% 
+  group_by(year) %>% summarize(max_price = max(usd_msrp)) %>% 
+  ggplot(aes(x=year,y=max_price)) + geom_line()
+
+lego %>% filter(!is.na(usd_msrp))  %>% 
+  group_by(year) %>% summarize(med_price = median(usd_msrp)) %>% 
+  ggplot(aes(x=year,y=med_price)) + geom_line()
+
+
+
+
+
 
 
